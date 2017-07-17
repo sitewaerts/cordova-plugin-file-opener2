@@ -26,14 +26,35 @@ var exec = require('cordova/exec');
 
 function FileOpener2() {}
 
-FileOpener2.prototype.open = function (fileName, contentType, callbackContext) {
-    callbackContext = callbackContext || {};
-    exec(callbackContext.success || null, callbackContext.error || null, 'FileOpener2', 'open', [fileName, contentType]);
+FileOpener2.prototype.open = function (fileName, contentType, options) {
+    options = options || {};
+
+    var params = [fileName, contentType, !options.noPreview];
+
+    //to dismiss the dialog we need the fileName used to open it
+    this.fileName = fileName;
+
+    if (options.rect) {
+        //[x,y,w,h] coordinate positioning is available for openWith on iPads
+        params.push(options.rect);
+    }
+
+    exec(options.success || null, options.error || null, 'FileOpener2', 'open', params);
 };
 
-FileOpener2.prototype.showOpenWithDialog = function (fileName, contentType, callbackContext) {
-    callbackContext = callbackContext || {};
-    exec(callbackContext.success || null, callbackContext.error || null, 'FileOpener2', 'open', [fileName, contentType, false]);
+FileOpener2.prototype.showOpenWithDialog = function (fileName, contentType, options) {
+    options = options || {};
+    options.noPreview = true;
+
+    this.open(fileName, contentType, options);
+};
+
+FileOpener2.prototype.close = function () {
+    try {
+        exec(null, null, 'FileOpener2', 'close', []);
+    } catch(e) {
+        //only supported on ios for now
+    }
 };
 
 FileOpener2.prototype.uninstall = function (packageId, callbackContext) {

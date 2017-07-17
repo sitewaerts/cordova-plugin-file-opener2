@@ -31,17 +31,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 - (void) open: (CDVInvokedUrlCommand*)command {
 
-    NSString *path = [[command.arguments objectAtIndex:0] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-	NSString *contentType = nil;
-	BOOL showPreview = YES;
-
-	if([command.arguments count] == 2) { // Includes contentType
-		contentType = [command.arguments objectAtIndex:1];
-	}
-
-	if ([command.arguments count] == 3) {
-		showPreview = [[command.arguments objectAtIndex:2] boolValue];
-	}
+	NSString *path = [[command.arguments objectAtIndex:0] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+	BOOL showPreview = [[command.arguments objectAtIndex:2] boolValue];
 
 	CDVViewController* cont = (CDVViewController*)[super viewController];
 	self.cdvViewController = cont;
@@ -56,15 +47,15 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 		localFile = fileURL.path;
 
-	    NSLog(@"looking for file at %@", fileURL);
-	    NSFileManager *fm = [NSFileManager defaultManager];
-	    if(![fm fileExistsAtPath:localFile]) {
-	    	NSDictionary *jsonObj = @{@"status" : @"9",
-	    	@"message" : @"File does not exist"};
-	    	CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:jsonObj];
-	      	[self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-	      	return;
-    	}
+		NSLog(@"looking for file at %@", fileURL);
+		NSFileManager *fm = [NSFileManager defaultManager];
+		if(![fm fileExistsAtPath:localFile]) {
+			NSDictionary *jsonObj = @{@"status" : @"9",
+			@"message" : @"File does not exist"};
+			CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:jsonObj];
+			[self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+			return;
+		}
 
 		docController = [UIDocumentInteractionController  interactionControllerWithURL:fileURL];
 		docController.delegate = self;
@@ -78,8 +69,20 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		if (showPreview) {
 			wasOpened = [docController presentPreviewAnimated: NO];
 		} else {
-			CDVViewController* cont = self.cdvViewController;
+			//@NOTE: this will not work on iPad, rendering at or beyond full height (768px) will violate a view constraint
+			//Use the options.rect parameter to FileOpener2.open() in JavaScript to position the element which starts at x+w,y+h (the bottom right corner of CGRect)
 			CGRect rect = CGRectMake(0, 0, cont.view.bounds.size.width, cont.view.bounds.size.height);
+
+			if ([command.arguments count] > 3) {
+				GCFloat *pointScale = [[UIScreen mainScreen] scale];
+				NSArray *coords = [command.arguments objectAtIndex: 3];
+				rect = CGRectMake(
+					[[coords objectAtIndex:0] floatValue] * pointScale,
+					[[coords objectAtIndex:1] floatValue] * pointScale,
+					[[coords objectAtIndex:2] floatValue] * pointScale,
+					[[coords objectAtIndex:3] floatValue] * pointScale);
+			}
+
 			wasOpened = [docController presentOpenInMenuFromRect:rect inView:cont.view animated:YES];
 		}
 
@@ -97,6 +100,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		}
 		[self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 	});
+}
+
+- (void) close: (CDVInvokedUrlCommand*)command {
+
+	[self.controller dismissMenuAnimated:YES];
+
+	CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@""];
+	[self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
 @end
