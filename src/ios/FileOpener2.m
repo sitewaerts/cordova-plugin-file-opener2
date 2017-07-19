@@ -74,7 +74,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			CGRect rect = CGRectMake(0, 0, cont.view.bounds.size.width, cont.view.bounds.size.height);
 
 			if ([command.arguments count] > 3) {
-				CGFloat *pointScale = [[UIScreen mainScreen] scale];
+				CGFloat pointScale = [[UIScreen mainScreen] scale];
 				NSArray *coords = [command.arguments objectAtIndex: 3];
 				rect = CGRectMake(
 					[[coords objectAtIndex:0] floatValue] * pointScale,
