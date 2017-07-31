@@ -74,13 +74,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			CGRect rect = CGRectMake(0, 0, cont.view.bounds.size.width, cont.view.bounds.size.height);
 
 			if ([command.arguments count] > 3) {
-				CGFloat pointScale = [[UIScreen mainScreen] scale];
 				NSArray *coords = [command.arguments objectAtIndex: 3];
 				rect = CGRectMake(
-					[[coords objectAtIndex:0] floatValue] * pointScale,
-					[[coords objectAtIndex:1] floatValue] * pointScale,
-					[[coords objectAtIndex:2] floatValue] * pointScale,
-					[[coords objectAtIndex:3] floatValue] * pointScale);
+					[[coords objectAtIndex:0] floatValue],
+					[[coords objectAtIndex:1] floatValue],
+					[[coords objectAtIndex:2] floatValue],
+					[[coords objectAtIndex:3] floatValue]);
 			}
 
 			wasOpened = [docController presentOpenInMenuFromRect:rect inView:cont.view animated:YES];
