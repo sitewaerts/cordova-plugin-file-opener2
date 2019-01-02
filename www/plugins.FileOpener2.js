@@ -26,27 +26,29 @@ var exec = require('cordova/exec');
 
 function FileOpener2() {}
 
-FileOpener2.prototype.open = function (fileName, contentType, options) {
-    options = options || {};
+FileOpener2.prototype.open = function (fileName, contentType, callbackContext) {
+    contentType = contentType || '';
+    callbackContext = callbackContext || {};
 
-    var params = [fileName, contentType, !options.noPreview];
+    var params = [fileName, contentType, !callbackContext.noPreview];
 
     //to dismiss the dialog we need the fileName used to open it
     this.fileName = fileName;
 
-    if (options.rect) {
+    if (callbackContext.rect) {
         //[x,y,w,h] coordinate positioning is available for openWith on iPads
-        params.push(options.rect);
+        params.push(callbackContext.rect);
     }
 
-    exec(options.success || null, options.error || null, 'FileOpener2', 'open', params);
+    exec(callbackContext.success || null, callbackContext.error || null, 'FileOpener2', 'open', params);
 };
 
-FileOpener2.prototype.showOpenWithDialog = function (fileName, contentType, options) {
-    options = options || {};
-    options.noPreview = true;
+FileOpener2.prototype.showOpenWithDialog = function (fileName, contentType, callbackContext) {
+    contentType = contentType || '';
+    callbackContext = callbackContext || {};
+    callbackContext.noPreview = true;
 
-    this.open(fileName, contentType, options);
+    this.open(fileName, contentType, callbackContext);
 };
 
 FileOpener2.prototype.close = function () {
