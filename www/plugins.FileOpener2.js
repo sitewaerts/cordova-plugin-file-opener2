@@ -29,13 +29,34 @@ function FileOpener2() {}
 FileOpener2.prototype.open = function (fileName, contentType, callbackContext) {
     contentType = contentType || '';
     callbackContext = callbackContext || {};
-    exec(callbackContext.success || null, callbackContext.error || null, 'FileOpener2', 'open', [fileName, contentType]);
+
+    var params = [fileName, contentType, !callbackContext.noPreview];
+
+    //to dismiss the dialog we need the fileName used to open it
+    this.fileName = fileName;
+
+    if (callbackContext.rect) {
+        //[x,y,w,h] coordinate positioning is available for openWith on iPads
+        params.push(callbackContext.rect);
+    }
+
+    exec(callbackContext.success || null, callbackContext.error || null, 'FileOpener2', 'open', params);
 };
 
 FileOpener2.prototype.showOpenWithDialog = function (fileName, contentType, callbackContext) {
     contentType = contentType || '';
     callbackContext = callbackContext || {};
-    exec(callbackContext.success || null, callbackContext.error || null, 'FileOpener2', 'open', [fileName, contentType, false]);
+    callbackContext.noPreview = true;
+
+    this.open(fileName, contentType, callbackContext);
+};
+
+FileOpener2.prototype.close = function () {
+    try {
+        exec(null, null, 'FileOpener2', 'close', []);
+    } catch(e) {
+        //only supported on ios for now
+    }
 };
 
 FileOpener2.prototype.uninstall = function (packageId, callbackContext) {

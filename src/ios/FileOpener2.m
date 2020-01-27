@@ -31,9 +31,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 - (void) open: (CDVInvokedUrlCommand*)command {
 
-    NSString *path = [command.arguments objectAtIndex:0];
+	NSString *path = [[command.arguments objectAtIndex:0] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
 	NSString *contentType = [command.arguments objectAtIndex:1];
-	BOOL showPreview = YES;
+	BOOL showPreview = [[command.arguments objectAtIndex:2] boolValue];
 
 	if ([command.arguments count] >= 3) {
 		showPreview = [[command.arguments objectAtIndex:2] boolValue];
@@ -87,8 +87,19 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		if (showPreview) {
 			wasOpened = [docController presentPreviewAnimated: NO];
 		} else {
-			CDVViewController* cont = self.cdvViewController;
-			CGRect rect = CGRectMake(cont.view.bounds.size.width, 0, cont.view.bounds.size.height, 0);
+			//@NOTE: this will not work on iPad, rendering at or beyond full height (768px) will violate a view constraint
+			//Use the options.rect parameter to FileOpener2.open() in JavaScript to position the element which starts at x+w,y+h (the bottom right corner of CGRect)
+			CGRect rect = CGRectMake(0, 0, cont.view.bounds.size.width, cont.view.bounds.size.height);
+
+			if ([command.arguments count] > 3) {
+				NSArray *coords = [command.arguments objectAtIndex: 3];
+				rect = CGRectMake(
+					[[coords objectAtIndex:0] floatValue],
+					[[coords objectAtIndex:1] floatValue],
+					[[coords objectAtIndex:2] floatValue],
+					[[coords objectAtIndex:3] floatValue]);
+			}
+
 			wasOpened = [docController presentOpenInMenuFromRect:rect inView:cont.view animated:YES];
 		}
 
@@ -106,6 +117,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		}
 		[self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 	});
+}
+
+- (void) close: (CDVInvokedUrlCommand*)command {
+
+	[self.controller dismissMenuAnimated:YES];
+
+	CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@""];
+	[self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
 @end
