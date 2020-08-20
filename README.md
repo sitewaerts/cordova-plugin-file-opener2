@@ -112,7 +112,8 @@ cordova.plugins.fileOpener2.showOpenWithDialog(
         },
         success : function () {
             console.log('file opened successfully');
-        }
+        },
+        pos : [10, 10] // needed on iPad to avoid ui errors 
     }
 );
 ```

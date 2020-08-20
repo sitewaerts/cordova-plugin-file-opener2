@@ -35,14 +35,23 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	NSString *contentType = [command.arguments objectAtIndex:1];
 	BOOL showPreview = [[command.arguments objectAtIndex:2] boolValue];
 
-	if ([command.arguments count] >= 3) {
-		showPreview = [[command.arguments objectAtIndex:2] boolValue];
-	}
-
 	CDVViewController* cont = (CDVViewController*)[super viewController];
 	self.cdvViewController = cont;
-	NSString *uti = nil;
 
+    CGRect rect;
+    if ([command.arguments count] > 3) {
+        NSArray *pos = [command.arguments objectAtIndex: 3];
+        rect = CGRectMake(0, 0, [[pos objectAtIndex:0] floatValue], [[pos objectAtIndex:1] floatValue]);
+    }
+    else
+    {
+        //@NOTE: this will not work on iPad, rendering at or beyond full height (768px) will violate a view constraint
+        //Use the options.pos parameter to FileOpener2.open() in JavaScript to position the element x,y from the top left corner of CGRect
+        rect = CGRectMake(0, 0, cont.view.bounds.size.width, cont.view.bounds.size.height);
+    }
+
+
+	NSString *uti = nil;
 	if([contentType length] == 0){
 		NSArray *dotParts = [path componentsSeparatedByString:@"."];
 		NSString *fileExt = [dotParts lastObject];
@@ -53,27 +62,27 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	}
 
 	dispatch_async(dispatch_get_main_queue(), ^{
-		NSURL *fileURL = NULL;
-		NSString *decodedPath = [path stringByRemovingPercentEncoding];
-		if ([path isEqualToString:decodedPath]) {
-				NSLog(@"Path parameter not encoded. Building file URL encoding it...");
-				fileURL = [NSURL fileURLWithPath:[path stringByReplacingOccurrencesOfString:@"file://" withString:@""]];;
-		} else {
-				NSLog(@"Path parameter already encoded. Building file URL without encoding it...");
-				fileURL = [NSURL URLWithString:path];
-		}
+        NSURL *fileURL = NULL;
+        NSString *decodedPath = [path stringByRemovingPercentEncoding];
+        if ([path isEqualToString:decodedPath]) {
+                NSLog(@"Path parameter not encoded. Building file URL encoding it...");
+                fileURL = [NSURL fileURLWithPath:[path stringByReplacingOccurrencesOfString:@"file://" withString:@""]];;
+        } else {
+                NSLog(@"Path parameter already encoded. Building file URL without encoding it...");
+                fileURL = [NSURL URLWithString:path];
+        }
 
 		localFile = fileURL.path;
 
-	    NSLog(@"looking for file at %@", fileURL);
-	    NSFileManager *fm = [NSFileManager defaultManager];
-	    if(![fm fileExistsAtPath:localFile]) {
-	    	NSDictionary *jsonObj = @{@"status" : @"9",
-	    	@"message" : @"File does not exist"};
-	    	CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:jsonObj];
-	      	[self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-	      	return;
-    	}
+		NSLog(@"looking for file at %@", fileURL);
+		NSFileManager *fm = [NSFileManager defaultManager];
+		if(![fm fileExistsAtPath:localFile]) {
+			NSDictionary *jsonObj = @{@"status" : @"9",
+			@"message" : @"File does not exist"};
+			CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:jsonObj];
+			[self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+			return;
+		}
 
 		docController = [UIDocumentInteractionController  interactionControllerWithURL:fileURL];
 		docController.delegate = self;
@@ -87,19 +96,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		if (showPreview) {
 			wasOpened = [docController presentPreviewAnimated: NO];
 		} else {
-			//@NOTE: this will not work on iPad, rendering at or beyond full height (768px) will violate a view constraint
-			//Use the options.rect parameter to FileOpener2.open() in JavaScript to position the element which starts at x+w,y+h (the bottom right corner of CGRect)
-			CGRect rect = CGRectMake(0, 0, cont.view.bounds.size.width, cont.view.bounds.size.height);
-
-			if ([command.arguments count] > 3) {
-				NSArray *coords = [command.arguments objectAtIndex: 3];
-				rect = CGRectMake(
-					[[coords objectAtIndex:0] floatValue],
-					[[coords objectAtIndex:1] floatValue],
-					[[coords objectAtIndex:2] floatValue],
-					[[coords objectAtIndex:3] floatValue]);
-			}
-
+		    CDVViewController* cont = self.cdvViewController;
 			wasOpened = [docController presentOpenInMenuFromRect:rect inView:cont.view animated:YES];
 		}
 
@@ -131,14 +128,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 @implementation FileOpener2 (UIDocumentInteractionControllerDelegate)
 	- (UIViewController *)documentInteractionControllerViewControllerForPreview:(UIDocumentInteractionController *)controller {
-		UIViewController *presentingViewController = self.viewController;
-		if (presentingViewController.view.window != [UIApplication sharedApplication].keyWindow){
-			presentingViewController = [UIApplication sharedApplication].keyWindow.rootViewController;
-		}
-
-		while (presentingViewController.presentedViewController != nil && ![presentingViewController.presentedViewController isBeingDismissed]){
-			presentingViewController = presentingViewController.presentedViewController;
-		}
-		return presentingViewController;
+		return self.cdvViewController;
 	}
 @end
