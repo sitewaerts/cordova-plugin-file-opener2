@@ -22,21 +22,27 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 package io.github.pwlin.cordova.plugins.fileopener2;
 
-import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.net.Uri;
-import android.os.Build;
-import android.webkit.MimeTypeMap;
-import org.apache.cordova.CallbackContext;
-import org.apache.cordova.CordovaPlugin;
-import org.apache.cordova.CordovaResourceApi;
-import org.apache.cordova.PluginResult;
+import java.io.File;
+import java.util.List;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.net.Uri;
+import android.os.Build;
+import android.webkit.MimeTypeMap;
+
+import io.github.pwlin.cordova.plugins.fileopener2.FileProvider;
+
+import org.apache.cordova.CordovaPlugin;
+import org.apache.cordova.CallbackContext;
+import org.apache.cordova.PluginResult;
+import org.apache.cordova.CordovaResourceApi;
 
 public class FileOpener2 extends CordovaPlugin {
 
@@ -46,7 +52,7 @@ public class FileOpener2 extends CordovaPlugin {
 	 * @param action
 	 *            The action to execute.
 	 * @param args
-	 *            JSONArray of arguments for the plugin.
+	 *            JSONArry of arguments for the plugin.
 	 * @param callbackContext
 	 *            The callback context used when calling back into JavaScript.
 	 * @return boolean.
@@ -55,7 +61,7 @@ public class FileOpener2 extends CordovaPlugin {
 		if (action.equals("open")) {
 			String fileUrl = args.getString(0);
 			String contentType = args.getString(1);
-			boolean openWithDefault = true;
+			Boolean openWithDefault = true;
 			if(args.length() > 2){
 				openWithDefault = args.getBoolean(2);
 			}
@@ -86,7 +92,7 @@ public class FileOpener2 extends CordovaPlugin {
 	}
 
 	private void _open(String fileArg, String contentType, Boolean openWithDefault, CallbackContext callbackContext) throws JSONException {
-		String fileName;
+		String fileName = "";
 		try {
 			CordovaResourceApi resourceApi = webView.getResourceApi();
 			Uri fileUri = resourceApi.remapUri(Uri.parse(fileArg));
@@ -179,7 +185,7 @@ public class FileOpener2 extends CordovaPlugin {
 
 	private boolean _appIsInstalled(String packageId) {
 		PackageManager pm = cordova.getActivity().getPackageManager();
-        boolean appInstalled;
+        boolean appInstalled = false;
         try {
             pm.getPackageInfo(packageId, PackageManager.GET_ACTIVITIES);
             appInstalled = true;
