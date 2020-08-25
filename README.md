@@ -21,16 +21,6 @@ cordova.plugins.fileOpener2.open(
 $ cordova plugin add cordova-plugin-file-opener2
 ```
 
-### Optional variables
-
-This plugin requires the Android support library v4. From release `2.1.0` the version of this can be set at installation. The minimum version is `24.1.0`. Default value is `27.+`. [Check out the latest version](https://developer.android.com/topic/libraries/support-library/revisions.html).
-
-```shell
-$ cordova plugin add cordova-plugin-file-opener2  --variable ANDROID_SUPPORT_V4_VERSION="27.+"
-```
-
-If you are using the `cordova-android-support-gradle-release` plugin it should match the value you have set there.
-
 ## Requirements
 
 The following platforms and versions are supported by the latest release:
