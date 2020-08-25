@@ -31,27 +31,18 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 - (void) open: (CDVInvokedUrlCommand*)command {
 
-	NSString *path = [[command.arguments objectAtIndex:0] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    NSString *path = [command.arguments objectAtIndex:0];
 	NSString *contentType = [command.arguments objectAtIndex:1];
-	BOOL showPreview = [[command.arguments objectAtIndex:2] boolValue];
+	BOOL showPreview = YES;
+
+	if ([command.arguments count] >= 3) {
+		showPreview = [[command.arguments objectAtIndex:2] boolValue];
+	}
 
 	CDVViewController* cont = (CDVViewController*)[super viewController];
 	self.cdvViewController = cont;
-
-    CGRect rect;
-    if ([command.arguments count] > 3) {
-        NSArray *pos = [command.arguments objectAtIndex: 3];
-        rect = CGRectMake(0, 0, [[pos objectAtIndex:0] floatValue], [[pos objectAtIndex:1] floatValue]);
-    }
-    else
-    {
-        //@NOTE: this will not work on iPad, rendering at or beyond full height (768px) will violate a view constraint
-        //Use the options.pos parameter to FileOpener2.open() in JavaScript to position the element x,y from the top left corner of CGRect
-        rect = CGRectMake(0, 0, cont.view.bounds.size.width, cont.view.bounds.size.height);
-    }
-
-
 	NSString *uti = nil;
+
 	if([contentType length] == 0){
 		NSArray *dotParts = [path componentsSeparatedByString:@"."];
 		NSString *fileExt = [dotParts lastObject];
@@ -62,27 +53,27 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	}
 
 	dispatch_async(dispatch_get_main_queue(), ^{
-        NSURL *fileURL = NULL;
-        NSString *decodedPath = [path stringByRemovingPercentEncoding];
-        if ([path isEqualToString:decodedPath]) {
-                NSLog(@"Path parameter not encoded. Building file URL encoding it...");
-                fileURL = [NSURL fileURLWithPath:[path stringByReplacingOccurrencesOfString:@"file://" withString:@""]];;
-        } else {
-                NSLog(@"Path parameter already encoded. Building file URL without encoding it...");
-                fileURL = [NSURL URLWithString:path];
-        }
+		NSURL *fileURL = NULL;
+		NSString *decodedPath = [path stringByRemovingPercentEncoding];
+		if ([path isEqualToString:decodedPath]) {
+				NSLog(@"Path parameter not encoded. Building file URL encoding it...");
+				fileURL = [NSURL fileURLWithPath:[path stringByReplacingOccurrencesOfString:@"file://" withString:@""]];;
+		} else {
+				NSLog(@"Path parameter already encoded. Building file URL without encoding it...");
+				fileURL = [NSURL URLWithString:path];
+		}
 
 		localFile = fileURL.path;
 
-		NSLog(@"looking for file at %@", fileURL);
-		NSFileManager *fm = [NSFileManager defaultManager];
-		if(![fm fileExistsAtPath:localFile]) {
-			NSDictionary *jsonObj = @{@"status" : @"9",
-			@"message" : @"File does not exist"};
-			CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:jsonObj];
-			[self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-			return;
-		}
+	    NSLog(@"looking for file at %@", fileURL);
+	    NSFileManager *fm = [NSFileManager defaultManager];
+	    if(![fm fileExistsAtPath:localFile]) {
+	    	NSDictionary *jsonObj = @{@"status" : @"9",
+	    	@"message" : @"File does not exist"};
+	    	CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:jsonObj];
+	      	[self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+	      	return;
+    	}
 
 		docController = [UIDocumentInteractionController  interactionControllerWithURL:fileURL];
 		docController.delegate = self;
@@ -91,12 +82,27 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		CDVPluginResult* pluginResult = nil;
 
 		//Opens the file preview
+		CGRect rect;
+		if ([command.arguments count] >= 4) {
+			NSArray *positionValues = [command.arguments objectAtIndex:3];
+
+        		if (![positionValues isEqual:[NSNull null]] && [positionValues count] >= 2) {
+                		rect = CGRectMake(0, 0, [[positionValues objectAtIndex:0] floatValue], [[positionValues objectAtIndex:1] floatValue]);
+        		} else {
+                		rect = CGRectMake(0, 0, 0, 0);
+        		}
+		} else {
+        //@NOTE: this will not work on iPad, rendering at or beyond full height (768px) will violate a view constraint
+        //Use the options.pos parameter to FileOpener2.open() in JavaScript to position the element x,y from the top left corner of CGRect
+			rect = CGRectMake(0, 0, cont.view.bounds.size.width, cont.view.bounds.size.height);
+		}
+
 		BOOL wasOpened = NO;
 
 		if (showPreview) {
 			wasOpened = [docController presentPreviewAnimated: NO];
 		} else {
-		    CDVViewController* cont = self.cdvViewController;
+			CDVViewController* cont = self.cdvViewController;
 			wasOpened = [docController presentOpenInMenuFromRect:rect inView:cont.view animated:YES];
 		}
 
@@ -128,6 +134,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 @implementation FileOpener2 (UIDocumentInteractionControllerDelegate)
 	- (UIViewController *)documentInteractionControllerViewControllerForPreview:(UIDocumentInteractionController *)controller {
-		return self.cdvViewController;
+		UIViewController *presentingViewController = self.viewController;
+		if (presentingViewController.view.window != [UIApplication sharedApplication].keyWindow){
+			presentingViewController = [UIApplication sharedApplication].keyWindow.rootViewController;
+		}
+
+		while (presentingViewController.presentedViewController != nil && ![presentingViewController.presentedViewController isBeingDismissed]){
+			presentingViewController = presentingViewController.presentedViewController;
+		}
+		return presentingViewController;
 	}
 @end

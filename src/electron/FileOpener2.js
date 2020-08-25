@@ -1,7 +1,7 @@
 /*
 The MIT License (MIT)
 
-Copyright (c) 2013 pwlin - pwlin05@gmail.com
+Copyright (c) 2020 pwlin - pwlin05@gmail.com
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -20,10 +20,16 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
-package io.github.pwlin.cordova.plugins.fileopener2;
-
-/*
- * http://stackoverflow.com/questions/40746144/error-with-duplicated-fileprovider-in-manifest-xml-with-cordova/41550634#41550634
- */
-public class FileProvider extends androidx.core.content.FileProvider {
-}
+// https://www.electronjs.org/docs/api/shell
+const { shell } = global.require('electron');
+module.exports = {
+  open: function (onSuccess, onError, fileName) {
+    var opn = shell.openItem(fileName[0]);
+    if (opn === true) {
+      onSuccess(true);
+    } else {
+      onError({'status': 0, 'message': 'Failed opening file.'});
+    }
+  }
+};
+require('cordova/exec/proxy').add('FileOpener2', module.exports);
