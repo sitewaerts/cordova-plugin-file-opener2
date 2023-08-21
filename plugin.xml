@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android" id="cordova-plugin-file-opener2" version="3.0.5">
+<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        id="cordova-plugin-file-opener2"
+        version="3.0.6-sw">
 
     <name>File Opener2</name>
     <description>A File Opener Plugin for Cordova. (The Original Version)</description>
@@ -23,7 +26,9 @@
             </feature>
         </config-file>
         <config-file target="AndroidManifest.xml" parent="/*">
-            <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+            <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
+            <uses-permission android:name="android.permission.READ_MEDIA_VIDEO"/>
+            <uses-permission android:name="android.permission.READ_MEDIA_AUDIO"/>
         </config-file>
         <config-file target="AndroidManifest.xml" parent="application">
           <provider android:name="io.github.pwlin.cordova.plugins.fileopener2.FileProvider" android:authorities="${applicationId}.fileOpener2.provider" android:exported="false" android:grantUriPermissions="true">
