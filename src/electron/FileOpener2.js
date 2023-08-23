@@ -24,7 +24,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 const { shell } = require('electron');
 module.exports = {
   open: function (onSuccess, onError, fileName) {
-    var opn = shell.openItem(fileName[0]);
+    const opn = shell.openExternal(fileName[0]);
     if (opn === true) {
       onSuccess(true);
     } else {
@@ -32,4 +32,3 @@ module.exports = {
     }
   }
 };
-require('cordova/exec/proxy').add('FileOpener2', module.exports);
