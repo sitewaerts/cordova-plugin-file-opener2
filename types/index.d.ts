@@ -6,6 +6,10 @@
 // Copyright (c) Microsoft Open Technologies Inc
 // Licensed under the MIT license
 
+interface Callbacks{
+    success?: ()=>void
+    error?: (error?:any)=>void
+}
 
 /**
  *
@@ -15,14 +19,12 @@ interface FileOpener2 {
      * Open file with system default application
      * @param fileURL  Filesystem URL representing the file on the device.
      * @param mimeType
-     * @param successCallback
-     * @param errorCallback
+     * @param callbacks
      */
     open(
         fileURL: string,
         mimeType: string | null,
-        successCallback: () => void,
-        errorCallback: (error: any) => void
+        callbacks?: Callbacks
     )
 }
 
