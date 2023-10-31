@@ -1,11 +1,11 @@
 {
   "name": "cordova-plugin-file-opener2",
   "version": "0.0.0",
-  "main": "FileOpener2.js",
+  "main": "index.js",
   "cordova": {
     "serviceName": "FileOpener2"
   },
-  "dependencies": {
-    "electron": "^26.0.0"
+  "devDependencies": {
+    "@types/electron": "^1.6.10"
   }
 }

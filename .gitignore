@@ -7,3 +7,5 @@
 *.bak
 *.iml
 .idea
+/src/electron/package-lock.json
+/src/electron/node_modules/
