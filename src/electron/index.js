@@ -23,28 +23,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // https://www.electronjs.org/docs/api/shell
 const {shell} = require('electron');
 
-/**
- *
- * @param callbackContext
- * @returns {any}
- */
-function getFilePluginUtil(callbackContext)
-{
-    return callbackContext.getCordovaService('File').util;
-}
-
-/**
- * get absolute file path for given url (cdvfile://, efs://)
- * @param {string} url
- * @param callbackContext
- * @returns {string | null}
- */
-function urlToFilePath(url, callbackContext)
-{
-    return getFilePluginUtil(callbackContext).urlToFilePath(url);
-}
-
-
 
 const fileOpenerPlugin = {
     /**
@@ -54,7 +32,7 @@ const fileOpenerPlugin = {
      */
     open: function ([fileName], callbackContext)
     {
-        const path = urlToFilePath(fileName, callbackContext);
+        const path = _file_plugin_util.urlToFilePath(fileName);
         if (path)
         {
             shell.openPath(path)
@@ -112,30 +90,15 @@ const plugin = function (action, args, callbackContext)
     return true;
 }
 
-// backwards compatibility: attach api methods for direct access from old cordova-electron platform impl
-Object.keys(fileOpenerPlugin).forEach((apiMethod) =>
-{
-    plugin[apiMethod] = (args) =>
-    {
-        return Promise.resolve((resolve, reject) =>
-        {
-            fileOpenerPlugin[apiMethod](args, {
-                progress: (data) =>
-                {
-                    console.warn("cordova-plugin-file-opener2: ignoring progress event as not supported in old plugin API", data);
-                },
-                success: (data) =>
-                {
-                    resolve(data)
-                },
-                error: (data) =>
-                {
-                    reject(data)
-                }
-            });
-        });
-    }
-});
+let _file_plugin_util;
 
+/**
+ * @param {Record<string, string>} variables
+ * @param {(serviceName:string)=>Promise<any>} serviceLoader
+ * @returns {Promise<void>}
+ */
+plugin.init = async (variables, serviceLoader)=>{
+    _file_plugin_util = _file_plugin_util || (await serviceLoader('File')).util
+}
 
 module.exports = plugin;
