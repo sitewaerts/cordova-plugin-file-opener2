@@ -28,7 +28,7 @@ const fileOpenerPlugin = {
     /**
      *
      * @param {string} fileName
-     * @param {CallbackContext} callbackContext
+     * @param {CordovaElectronCallbackContext} callbackContext
      */
     open: function ([fileName], callbackContext)
     {
@@ -69,11 +69,7 @@ const fileOpenerPlugin = {
 
 
 /**
- * cordova electron plugin api
- * @param {string} action
- * @param {Array<any>} args
- * @param {CallbackContext} callbackContext
- * @returns {boolean} indicating if action is available in plugin
+ * @type {CordovaElectronPlugin}
  */
 const plugin = function (action, args, callbackContext)
 {
@@ -92,13 +88,8 @@ const plugin = function (action, args, callbackContext)
 
 let _file_plugin_util;
 
-/**
- * @param {Record<string, string>} variables
- * @param {(serviceName:string)=>Promise<any>} serviceLoader
- * @returns {Promise<void>}
- */
-plugin.init = async (variables, serviceLoader)=>{
-    _file_plugin_util = _file_plugin_util || (await serviceLoader('File')).util
+plugin.initialize = async (ctx)=>{
+    _file_plugin_util = _file_plugin_util || (await ctx.getService('File')).util
 }
 
 module.exports = plugin;
