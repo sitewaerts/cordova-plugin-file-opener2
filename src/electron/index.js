@@ -32,6 +32,9 @@ const fileOpenerPlugin = {
      */
     open: function ([fileName], callbackContext)
     {
+
+        // TODO: evaluate <allow-intent href="???"/> from config.xml
+
         const path = _file_plugin_util.urlToFilePath(fileName);
         if (path)
         {
