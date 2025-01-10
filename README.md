@@ -30,9 +30,31 @@ The following platforms and versions are supported by the latest release:
 
 Cordova CLI 6.0 is supported by 2.0.19, but there are a number of issues, particularly with Android builds (see [232](https://github.com/pwlin/cordova-plugin-file-opener2/issues/232) [203](https://github.com/pwlin/cordova-plugin-file-opener2/issues/203) [207](https://github.com/pwlin/cordova-plugin-file-opener2/issues/207)). Using the [cordova-android-support-gradle-release](https://github.com/dpa99c/cordova-android-support-gradle-release) plugin may help.
 
-### AndroidX Support
+### Android
+
+#### AndroidX Support
 
 This plugin supports AndroidX out of the box.
+
+
+__Note:__ The author of the app has to make sure that the permission is listed in the manifest. 
+You may add the following lines to config.xml to achieve this, if you want images, videos and audios managed by other 
+apps to be accessible:
+
+Android starting with version 13.0
+
+see https://support.google.com/googleplay/android-developer/answer/14115180
+```xml
+<platform name="android">
+    <config-file target="app/src/main/AndroidManifest.xml" parent="/manifest"
+                 xmlns:android="http://schemas.android.com/apk/res/android">
+        <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
+        <uses-permission android:name="android.permission.READ_MEDIA_VIDEO"/>
+        <uses-permission android:name="android.permission.READ_MEDIA_AUDIO"/>
+    </config-file>
+</platform>
+```
+
 
 ## fileOpener2.open(filePath, mimeType, options)
 
