@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-file-opener2",
-  "version": "3.0.6-sw",
+  "version": "3.0.7-sw",
   "description": "A File Opener Plugin for Cordova. (The Original Version)",
   "types": "types/index.d.ts",
   "cordova": {
