@@ -2,7 +2,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
         xmlns:android="http://schemas.android.com/apk/res/android"
         id="cordova-plugin-file-opener2"
-        version="3.0.7-sw">
+        version="4.0.1-sw">
 
     <name>File Opener2</name>
     <description>A File Opener Plugin for Cordova. (The Original Version)</description>
@@ -45,7 +45,6 @@
         <source-file src="src/android/res/xml/opener_paths.xml" target-dir="res/xml"/>
         <framework src="androidx.appcompat:appcompat:1.0.0"/>
     </platform>
-    1
 
     <!-- iOS -->
     <platform name="ios">

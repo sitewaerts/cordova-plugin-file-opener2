@@ -41,6 +41,15 @@ __Note:__ The author of the app has to make sure that the permission is listed i
 You may add the following lines to config.xml to achieve this, if you want images, videos and audios managed by other 
 apps to be accessible:
 
+Android prior to version 13.0
+```xml
+<platform name="android">
+    <config-file target="AndroidManifest.xml" parent="/*">
+            <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+        </config-file>
+</platform>
+```
+
 Android starting with version 13.0
 
 see https://support.google.com/googleplay/android-developer/answer/14115180
@@ -62,7 +71,7 @@ Opens a file
 
 ### Supported Platforms
 
-- Android 4.4+
+- Android 5.1+
 - iOS 9+
 - Windows
 - Electron
@@ -115,7 +124,7 @@ Opens with system modal to open file with an already installed app.
 
 ### Supported Platforms
 
-- Android 4.4+
+- Android 5.1+
 - iOS 9+
 
 ### Quick Example
@@ -131,11 +140,11 @@ cordova.plugins.fileOpener2.showOpenWithDialog(
         success : function () {
             console.log('file opened successfully');
         },
-        pos : [0, 0] // needed on iPad to avoid ui errors 
+        position : [0, 0] // needed on iPad to avoid ui errors 
     }
 );
 ```
-`position` array of coordinates from top-left device screen, use for iOS dialog positioning.
+`position` array of coordinates from top-left device screen, use for iOS dialog positioning. `pos` may be used similar, ist just an alias. 
 
 ## fileOpener2.uninstall(packageId, callbackContext)
 
@@ -145,7 +154,7 @@ __Note__: You need to add `<uses-permission android:name="android.permission.REQ
 
 ### Supported Platforms
 
-- Android 4.4+
+- Android 5.1+
 
 ### Quick Example
 ```js
@@ -165,7 +174,7 @@ Check if an app is already installed.
 
 ### Supported Platforms
 
-- Android 4.4+
+- Android 5.1+
 
 ### Quick Example
 ```javascript
