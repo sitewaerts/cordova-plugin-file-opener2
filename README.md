@@ -9,8 +9,8 @@ cordova.plugins.fileOpener2.open(
     filePath,
     fileMIMEType,
     {
-        error : function(){ },
-        success : function(){ }
+        success: function(){ },
+        error: function(error){ }
     }
 );
 ```

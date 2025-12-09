@@ -37,7 +37,7 @@ function open(successCallback, errorCallback, data) {
     window.requestFileSystem(fileSystemLocalPath.fileSystem, 0, (fs) => {
       readFile(fs.root, fileSystemLocalPath.localPath + fileName).then((blob) => {
         FileSaver.saveAs(blob, fileName);
-        successCallback();
+        successCallback(true);
       }).catch((error) => {
         errorCallback(error);
       });

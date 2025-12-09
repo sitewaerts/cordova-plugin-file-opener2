@@ -141,7 +141,7 @@ public class FileOpener2 extends CordovaPlugin {
 					 cordova.getActivity().startActivity(Intent.createChooser(intent, "Open File in..."));
 				 }
 
-				callbackContext.success();
+				callbackContext.success(true);
 			} catch (android.content.ActivityNotFoundException e) {
 				JSONObject errorObj = new JSONObject();
 				errorObj.put("status", PluginResult.Status.ERROR.ordinal());

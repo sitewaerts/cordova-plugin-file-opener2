@@ -111,7 +111,7 @@ NSString* callbackId = nil;
 		}
 
 		if (wasOpened) {
-			pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString: @""];
+			pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:wasOpened];
 		} else {
 			NSDictionary *jsonObj = [ [NSDictionary alloc]
 				initWithObjectsAndKeys :

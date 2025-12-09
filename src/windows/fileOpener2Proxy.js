@@ -77,7 +77,7 @@
 	            
                 try{
 	                Windows.System.Launcher.launchFileAsync(file, options).then(function (success) {
-	                    successCallback();
+	                    successCallback(success);
 	                }, function (error) {
 	                    errorCallback(error);
 	                });

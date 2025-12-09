@@ -11,9 +11,6 @@ interface Callbacks{
     error?: (error?:any)=>void
 }
 
-/**
- *
- */
 interface FileOpener2 {
     /**
      * Open file with system default application
@@ -30,7 +27,7 @@ interface FileOpener2 {
 
 
 
-// plugin available at window.cordova.plugins.email
+// plugin available at window.cordova.plugins.fileOpener2
 interface CordovaPlugins {
     fileOpener2: FileOpener2
 }
