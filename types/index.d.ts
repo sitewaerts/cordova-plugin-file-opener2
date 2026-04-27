@@ -22,7 +22,7 @@ interface FileOpener2 {
         fileURL: string,
         mimeType: string | null,
         callbacks?: Callbacks
-    )
+    ):void
 }
 
 
